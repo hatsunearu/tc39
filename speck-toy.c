@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "speck-encrypt.c"
 
@@ -31,7 +32,7 @@ int internal_test() {
 
     speck_encrypt(p1, t1, k1);
 
-    printf("Expected Ciphertext: %016llx %016llx\nComputed Ciphertext: %016llx %016llx\n", c1[1], c1[0], t1[1], t1[0]);
+    printf("Expected Ciphertext: %016" PRIx64 " %016" PRIx64 "\nComputed Ciphertext: %016" PRIx64 " %016" PRIx64 "\n", c1[1], c1[0], t1[1], t1[0]);
     if (c1[1] == t1[1] && c1[0] == t1[0]) {
         printf("Test 1 Success.\n\n");
     }
@@ -53,7 +54,7 @@ int internal_test() {
 
     ctr_encode(p2, n2, 0, k2, t2);
 
-    printf("Expected Ciphertext: %016llx %016llx \nComputed Ciphertext: %016llx %016llx\n", c2[1], c2[0], t2[1], t2[0]);
+    printf("Expected Ciphertext: %016" PRIx64 " %016" PRIx64 " \nComputed Ciphertext: %016" PRIx64 " %016" PRIx64 "\n", c2[1], c2[0], t2[1], t2[0]);
     if (c2[1] == t2[1] && c2[0] == t2[0]) {
         printf("Test 2 Success.\n\n");
     }
@@ -75,7 +76,7 @@ int internal_test() {
 
     ctr_encode(c3, n3, 0, k3, t3);
     
-    printf("Expected Plaintext:  %016llx %016llx \nComputed Plaintext:  %016llx %016llx\n", p3[1], p3[0], t3[1], t3[0]);
+    printf("Expected Plaintext:  %016" PRIx64 " %016" PRIx64 " \nComputed Plaintext:  %016" PRIx64 " %016" PRIx64 "\n", p3[1], p3[0], t3[1], t3[0]);
     if (p3[1] == t3[1] && p3[0] == t3[0]) {
         printf("Test 3 Success.\n\n");
     }
@@ -85,8 +86,6 @@ int internal_test() {
     }
 
     
-    
-
     return failure;
 
     
