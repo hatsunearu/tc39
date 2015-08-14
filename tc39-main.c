@@ -3,7 +3,7 @@
 #include <inttypes.h>
 
 #include "speck-encrypt.c"
-#include "speck-toy-io.c"
+#include "tc39-io.c"
 
 //prototypes
 int internal_test();
