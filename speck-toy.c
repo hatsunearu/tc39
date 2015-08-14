@@ -3,17 +3,43 @@
 #include <inttypes.h>
 
 #include "speck-encrypt.c"
+#include "speck-toy-io.c"
 
 //prototypes
 int internal_test();
 void ctr_encode(uint64_t*, uint64_t*, uint64_t, uint64_t*, uint64_t*);
+void base64_encode(uint64_t*, uint64_t, char*);
+void block_encrypt(uint64_t*, uint64_t*, uint64_t, uint64_t*, uint64_t*);
 
+int main(int argc, char** argv) {
+    char* filename = "test.txt";
 
+    char* bufptr = NULL;
+   
+    uint64_t blockcnt = open_file(filename, &bufptr) * sizeof(char) / (2*sizeof(uint64_t));
+    printf("block count: %lld\n", blockcnt);
+    
+    if (blockcnt == 0) {
+        return 1; //error while reading file
+    }
 
-int main() {
+    uint64_t* ctptr = malloc(blockcnt * 2*sizeof(uint64_t));
 
-    internal_test();
+    uint64_t key[] = { 0x1122334455667788, 0x0123456789abceff };  
+    uint64_t nonce[] = { 0x2384626433832795, 0x3141592653589793 }; 
 
+    block_encrypt((uint64_t*)bufptr, ctptr, blockcnt, key, nonce);
+
+    for (int i = 0; i < blockcnt; i++) {
+        printf("%016"PRIx64" %016"PRIx64"\n", ctptr[i], ctptr[i+1]);
+    }
+
+}
+
+void block_encrypt(uint64_t* input, uint64_t* ciphertext, uint64_t blockcnt, uint64_t* key, uint64_t* nonce) {
+    for (int i = 0; i < blockcnt; i++) {
+        ctr_encode(input + i, nonce, i, key, ciphertext + i);
+    }
 }
 
 int internal_test() {
@@ -84,11 +110,7 @@ int internal_test() {
         failure = 1; 
         printf("Test 3 Failed.\n\n");
     }
-
-    
-    return failure;
-
-    
+    return failure; 
 
 }
 
@@ -101,3 +123,20 @@ void ctr_encode(uint64_t* pt_block, uint64_t* nonce, uint64_t count, uint64_t* k
     output[1] ^= pt_block[1];
 
 }
+
+/*
+void base64_encode(uint64_t* in, uint64_t len, char* out) {
+    // 000 111 222 333 444 5 | 55 666 777 888 999 00 | 0 111 222 333 444 555 | ...
+    
+    uint64_t blockind = 0; //index of block 
+    int ctr = 0;           //index inside each block
+    uint64_t chrcnt = 0;   //index to character
+    
+    uint16_t b64char = 0x000;
+
+    for (blockind = 0; blockind < len; blockind++) {
+        for (; ctr < 64; ctr+=3) {
+        }
+    } 
+}
+*/
