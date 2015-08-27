@@ -79,10 +79,10 @@ void test() {
     uint64_t nonce[] = { 0x2384626433832795, 0x3141592653589793 }; 
    
     c = fgetc(fpin);
-    while (c != EOF) { 
+    while (!feof(fpin)) { 
         pt[0] = 0;
         pt[1] = 0;
-        for (charcount = 0; charcount < 16 && c != EOF; c = fgetc(fpin), charcount++) {
+        for (charcount = 0; charcount < 16 && !feof(fpin); c = fgetc(fpin), charcount++) {
             if (charcount < 8) {
                 pt[0] ^= ((uint64_t)c & 0xff) << (120 - charcount*8);
             }
