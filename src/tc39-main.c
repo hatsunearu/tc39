@@ -2,72 +2,74 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#include <getopt.h>
+
+#include "tc39-errorcodes.h"
+
 #include "speck-encrypt.c"
-#include "tc39-io.c"
+//#include "tc39-io.c"
 
 //prototypes
 int internal_test();
 void ctr_encode(uint64_t*, uint64_t*, uint64_t, uint64_t*, uint64_t*);
 void base64_encode(uint64_t*, uint64_t, char*);
 void block_encrypt(uint64_t*, uint64_t*, uint64_t, uint64_t*, uint64_t*);
-void test();
+void test(FILE*, FILE*);
 
 
 int main(int argc, char** argv) {
 
-
-    test();
-    /*
-    char* filename = "test.txt";
-
-    char* bufptr = NULL;
+  char c;
+  char* input_file_name = NULL;
+  char* output_file_name = NULL;
  
-    uint64_t blockcnt = open_file(filename, &bufptr, BLOCK) / (2*sizeof(uint64_t));
-    
-    if (blockcnt == 0) {
-        return 1; //error while reading file
+  while ((c = getopt(argc, argv, "i:o:")) != -1) {
+    switch (c) {
+      case 'i':
+        input_file_name = optarg;
+        break;
+      case 'o':
+        output_file_name = optarg;
+        break;
+      case '?':
+        if (optopt == 'i' || optopt == 'o') {
+          fprintf(stderr, "You must provide a file name to %c.\n", optopt);
+          return NO_FILE_NAME_ERROR;
+        }
+        else {
+          fprintf(stderr, "Unknown options %c. \n", optopt);
+          return UNKNOWN_OPTIONS_ERROR;
+        }
     }
+  }
 
-    uint64_t* ctptr = malloc(blockcnt * 2*sizeof(uint64_t));
+  FILE* input_stream = stdin;
+  FILE* output_stream = stdout;
 
-    uint64_t key[] = { 0x1122334455667788, 0x0123456789abceff };  
-    uint64_t nonce[] = { 0x2384626433832795, 0x3141592653589793 }; 
-
-    //printf("bufptr: \n%s", bufptr);
-
-    block_encrypt((uint64_t*)bufptr, ctptr, blockcnt, key, nonce);
-
-    printf("Plaintext:\n");
-    for (int i = 0; i < blockcnt; i++) {
-        printf("%016"PRIx64" %016"PRIx64"\n", ((uint64_t*)bufptr)[2*i+1], ((uint64_t*)bufptr)[2*i]);
+  if (input_file_name != NULL) {
+    input_stream = fopen(input_file_name, "r");
+    if (input_stream == NULL) {
+      perror("Error opening input");
+      return FILE_OPEN_ERROR;
     }
-
-    printf("Ciphertext:\n");
-    for (int i = 0; i < blockcnt; i++) {
-        printf("%016"PRIx64" %016"PRIx64"\n", ctptr[2*i+1], ctptr[2*i]);
+  }
+  if (output_file_name != NULL) {
+    output_stream = fopen(output_file_name, "w");
+    if (output_stream == NULL) {
+      perror("Error opening output");
+      return FILE_OPEN_ERROR;
     }
+  }
 
-    free(bufptr);
-    free(ctptr);
-    */
+
+  test(input_stream, output_stream);
+
+  fclose(input_stream);
+  fclose(output_stream);
+
 }
 
-void test() {
-
-    FILE* fpin;
-    fpin = fopen("in.pt", "r");
-
-    FILE* fpout;
-    fpout = fopen("out.ct", "w");
-
-    if (fpin == NULL) {
-        perror("Error opening input");
-        return;
-    }
-    if (fpout == NULL) {
-        perror("Error opening output");
-        return;
-    }
+void test(FILE* fpin, FILE* fpout) {
 
     char c;
     uint64_t blockcount = 0;
@@ -90,9 +92,9 @@ void test() {
                 pt[1] ^= ((uint64_t)c & 0xff) << (56 - charcount*8);
             }
         }
-        printf("PT: %05d [ %016" PRIx64 " %016" PRIx64 " ] \n", blockcount, pt[0], pt[1]);
+        //printf("PT: %05d [ %016" PRIx64 " %016" PRIx64 " ] \n", blockcount, pt[0], pt[1]);
         ctr_encode(pt, nonce, blockcount, key, ct);
-        printf("CT: %05d [ %016" PRIx64 " %016" PRIx64 " ] \n\n", blockcount, ct[0], ct[1]);
+        //printf("CT: %05d [ %016" PRIx64 " %016" PRIx64 " ] \n\n", blockcount, ct[0], ct[1]);
         
         for (int i = 0; i < 8; i++) {
             fputc((char)(0xff & (ct[0] >> (56 - 8*i))), fpout);
@@ -103,9 +105,6 @@ void test() {
         
         blockcount++;
     }
-    fclose(fpin);
-    fclose(fpout);
-
 }
 
 void block_encrypt(uint64_t* input, uint64_t* ciphertext, uint64_t blockcnt, uint64_t* key, uint64_t* nonce) {
