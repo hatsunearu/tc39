@@ -16,8 +16,8 @@ make
 Encode then decode
 ```
 cat myname
-./tc39 -i myname -o myname.ct
+./tc39 -e -i myname -o myname.ct
 hexdump -Cv myname.ct
-./tc39 -i myname.ct -o myname.out
+./tc39 -d -i myname.ct -o myname.out
 cat myname.out
 ```
