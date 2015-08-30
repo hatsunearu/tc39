@@ -17,7 +17,7 @@ make
 ```
 cat myname
 ./tc39 -e -i myname -o myname.tc39
-hexdump -Cv myname.ct
+hexdump -Cv myname.tc39
 ```
 ### Decode
 ```
