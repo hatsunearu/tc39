@@ -13,11 +13,15 @@ make
 
 ## Examples
 
-Encode then decode
+### Encode
 ```
 cat myname
-./tc39 -e -i myname -o myname.ct
+./tc39 -e -i myname -o myname.tc39
 hexdump -Cv myname.ct
-./tc39 -d -i myname.ct -o myname.out
+```
+### Decode
+```
+./tc39 -d -i myname.tc39 -o myname.out
 cat myname.out
 ```
+
