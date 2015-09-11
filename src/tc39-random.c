@@ -1,16 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <syscall.h>
-#include <errno.h>
-#include <linux/random.h>
 
 void get_rand_128(uint64_t*);
 
 void get_rand_128(uint64_t* p) {
-  // old test nonce
-  // fix with real rng
-  p[0] = 0x2384626433832795;
-  p[1] = 0x3141592653589793;
 
+  FILE* fp = fopen("/dev/urandom", "r");
+  for (int i=0; i<8; i++) {
+    p[0] = (p[0] << 8) ^ (((uint64_t)fgetc(fp)) & 0xff);
+    p[1] = (p[1] << 8) ^ (((uint64_t)fgetc(fp)) & 0xff);
+  }
+  fclose(fp);
 }

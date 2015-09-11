@@ -14,8 +14,6 @@ Currently the random number generator is a dummy implementation, but the core CT
 
 ## Todo
 
-* Implement CSPRNG
-
 * Implement MAC
 
 * Implement Base64 Encode and Decode for processing ciphertext
@@ -35,15 +33,20 @@ make
 
 ## Examples
 
+### Generate key
+```
+dd if=/dev/urandom of=key bs=1 count=16
+```
+
 ### Encode
 ```
 cat myname
-./tc39 -e -i myname -o myname.tc39
+./tc39 -e myname.in -o myname.tc39 -k key
 hexdump -Cv myname.tc39
 ```
 ### Decode
 ```
-./tc39 -d -i myname.tc39 -o myname.out
+./tc39 -d myname.tc39 -o myname.out -k key
 cat myname.out
 ```
 

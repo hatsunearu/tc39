@@ -1,11 +1,11 @@
 #include "speck-encrypt.c"
 
-void encrypt(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce);
-void decrypt(FILE* fpin, FILE* fpout, uint64_t* key);
-void ctr_encode(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce); 
+void tc39_ctr_encrypt(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce);
+void tc39_ctr_decrypt(FILE* fpin, FILE* fpout, uint64_t* key);
+void tc39_ctr_encode(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce); 
 void block_encode(uint64_t*, uint64_t*, uint64_t*, uint64_t, uint64_t*);
 
-void encrypt(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce) {
+void tc39_ctr_encrypt(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce) {
 
   //output nonce
   for (int i=0; i<8; i++) {
@@ -15,10 +15,10 @@ void encrypt(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce) {
     fputc((char)(0xff & (nonce[1] >> (56 - 8*i))), fpout); 
   }
 
-  ctr_encode(fpin, fpout, key, nonce);
+  tc39_ctr_encode(fpin, fpout, key, nonce);
 }
 
-void decrypt(FILE* fpin, FILE* fpout, uint64_t* key) {
+void tc39_ctr_decrypt(FILE* fpin, FILE* fpout, uint64_t* key) {
 
   //read nonce
   uint64_t nonce[] = {0,0};
@@ -34,11 +34,11 @@ void decrypt(FILE* fpin, FILE* fpout, uint64_t* key) {
     }
   } 
  
-  ctr_encode(fpin, fpout, key, nonce); 
+  tc39_ctr_encode(fpin, fpout, key, nonce); 
 
 }
 
-void ctr_encode(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce) {
+void tc39_ctr_encode(FILE* fpin, FILE* fpout, uint64_t* key, uint64_t* nonce) {
 
   char c;
   uint64_t blockcount = 0;

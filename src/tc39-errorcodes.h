@@ -2,3 +2,6 @@
 #define UNKNOWN_OPTIONS_ERROR 2
 #define NO_FILE_NAME_ERROR 3
 #define NO_ACTION_ERROR 4
+#define KEY_IMPORT_ERROR 5
+#define MODE_ERROR 6
+#define KEY_TOO_LONG 7
